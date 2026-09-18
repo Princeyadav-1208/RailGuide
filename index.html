@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RailGuide - Live Train Status & Inquiry</title>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1><i class="fa-solid fa-train-subway"></i> RailGuide </h1>
+        <p>Live Train Status & Railway Inquiry</p>
+    </header>
+
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab('live')">
+                <i class="fa-solid fa-location-dot"></i> Live Status
+            </button>
+            <button class="tab-btn" onclick="switchTab('between')">
+                <i class="fa-solid fa-route"></i> Between Stations
+            </button>
+            <button class="tab-btn" onclick="switchTab('board')">
+                <i class="fa-solid fa-chalkboard"></i> Station Board
+            </button>
+            <button class="tab-btn" onclick="switchTab('pnr')">
+                <i class="fa-solid fa-ticket"></i> PNR Status
+            </button>
+        </div>
+
+        <!-- TAB 1: Live Train Status -->
+       
+<div id="tab-live" class="tab-content active">
+
+    <div class="live-search-card">
+
+        <div class="search-title">
+
+            <i class="fa-solid fa-train-subway"></i>
+
+            <div>
+
+                <h2>Track Live Train</h2>
+
+                <p>Search by Train Number or Train Name</p>
+
+            </div>
+
+        </div>
+
+        <form id="form-live" onsubmit="getLiveStatus(event)">
+
+            <div class="live-form-grid">
+
+                <!-- Train Search -->
+                <div class="input-field">
+
+                    <label>
+                        <i class="fa-solid fa-train"></i>
+                        Train Number / Train Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="live-train-input"
+                        placeholder="Enter Train Number / Name"
+                        autocomplete="off"
+                        required
+                    >
+
+                    <!-- Train Autocomplete -->
+                    <div id="train-suggestion-box"
+                         class="autocomplete-box">
+                    </div>
+
+                </div>
+
+                <!-- Journey Date -->
+                <div class="input-field">
+
+                    <label>
+                        <i class="fa-solid fa-calendar-days"></i>
+                        Journey Date
+                    </label>
+
+                    <input
+                        type="date"
+                        id="live-train-date"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="search-btn-area">
+
+                <button
+                    type="submit"
+                    class="live-search-btn">
+
+                    <i class="fa-solid fa-location-crosshairs"></i>
+
+                    Track Live Train
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- Loader -->
+
+    <div id="loader-live" class="loader">
+
+        <i class="fa-solid fa-spinner"></i>
+
+    </div>
+
+    <!-- Result -->
+
+    <div id="result-live" class="result-box">
+
+        <!-- Header -->
+
+        <div id="train-header-card"
+             class="train-header-card"
+             style="display:none;">
+
+            <div class="header-left">
+
+                <h2 id="train-name"></h2>
+
+                <p id="train-number"></p>
+
+            </div>
+
+            <div class="header-right">
+
+                <span id="train-status"
+                      class="status-badge">
+                </span>
+
+                <small id="last-update"></small>
+
+            </div>
+
+        </div>
+
+        <!-- Summary -->
+
+        <div id="summary-card"
+             class="summary-grid"
+             style="display:none;">
+
+            <div class="summary-box">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <h4>Current</h4>
+
+                <p id="current-location"></p>
+
+            </div>
+
+            <div class="summary-box">
+
+                <i class="fa-solid fa-clock"></i>
+
+                <h4>Delay</h4>
+
+                <p id="delay-minutes"></p>
+
+            </div>
+
+            <div class="summary-box">
+
+                <i class="fa-solid fa-road"></i>
+
+                <h4>Distance</h4>
+
+                <p id="distance-covered"></p>
+
+            </div>
+
+            <div class="summary-box">
+
+                <i class="fa-solid fa-train"></i>
+
+                <h4>Coach Position</h4>
+
+                <p id="coach-position"></p>
+
+            </div>
+
+        </div>
+
+        <!-- Journey Progress -->
+
+        <div id="journey-progress-card"
+             class="progress-card"
+             style="display:none;">
+
+            <div class="progress-header">
+
+                <span id="source-name"></span>
+
+                <span id="destination-name"></span>
+
+            </div>
+
+            <div class="progress">
+
+                <div id="journey-progress"
+                     class="progress-bar">
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Timeline -->
+
+        <div id="timeline-card" class="timeline-card">
+
+    <div class="timeline-title">
+
+        <i class="fa-solid fa-route"></i>
+
+        Journey Timeline
+
+    </div>
+
+    <div id="timeline-container" class="timeline-container">
+
+    </div>
+
+</div>
+
+        <!-- Legend -->
+
+        <div id="legend-card"
+             class="legend-card"
+             style="display:none;">
+
+            <span>🔵 Completed</span>
+
+            <span>🟢 Running</span>
+
+            <span>🔴 Stopped</span>
+
+            <span>⚪ Upcoming</span>
+
+        </div>
+
+    </div>
+
+</div>
+
+        <!-- TAB 2: Between Stations -->
+        <div id="tab-between" class="tab-content">
+            <div class="card">
+                <form id="form-between" onsubmit="getBetweenStations(event)">
+                    <div class="input-group">
+                        <div class="input-row">
+                            <div class="input-field">
+                                <label><i class="fa-solid fa-plane-departure"></i> From Station</label>
+                                <input type="text" id="between-source" placeholder="Station Code / Name" required autocomplete="off">
+                            </div>
+                            <div class="input-field">
+                                <label><i class="fa-solid fa-plane-arrival"></i> To Station</label>
+                                <input type="text" id="between-dest" placeholder="Station code / Name" required autocomplete="off">
+                            </div>
+                            <div class="input-field">
+                                <label><i class="fa-solid fa-calendar-days"></i> Journey Date</label>
+                                <input type="date" id="between-date" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-magnifying-glass"></i> Find Trains
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="loader-between" class="loader"><i class="fa-solid fa-spinner"></i></div>
+            <div id="result-between" class="result-box"></div>
+        </div>
+
+        <!-- TAB 3: Station Board -->
+        <div id="tab-board" class="tab-content">
+            <div class="card">
+                <form id="form-board" onsubmit="getStationBoard(event)">
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label><i class="fa-solid fa-building-columns"></i> Station Code or Name</label>
+                            <input type="text" id="board-station" placeholder="Station code / Name" required autocomplete="off">
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-magnifying-glass"></i> Get Station Board
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="loader-board" class="loader"><i class="fa-solid fa-spinner"></i></div>
+            <div id="result-board" class="result-box"></div>
+        </div>
+
+        <!-- TAB 4: PNR Status -->
+        <div id="tab-pnr" class="tab-content">
+            <div class="card">
+                <form id="form-pnr" onsubmit="getPNRStatus(event)">
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label><i class="fa-solid fa-id-card"></i> 10-Digit PNR Number</label>
+                            <input type="text" id="pnr-input" maxlength="10" placeholder="Enter 10-digit PNR" required pattern="\d{10}">
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-magnifying-glass"></i> Check PNR Status
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div id="loader-pnr" class="loader"><i class="fa-solid fa-spinner"></i></div>
+            <div id="result-pnr" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
