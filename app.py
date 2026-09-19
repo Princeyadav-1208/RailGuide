@@ -14,7 +14,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-# Frontend connect ke liye
+# Frontend connect
 CORS(app)
 
 
@@ -23,7 +23,7 @@ CORS(app)
 @app.route("/")
 def home():
     return jsonify({
-        "message": "Rail Guide AI Backend Running"
+        "message": "Rail Guide Backend Running"
     })
 
 
@@ -31,8 +31,7 @@ def home():
 # Train Live Status
 # Train Live Status Route (FIXED)
 @app.route("/train/live/<train>")
-def live_train_api(train):  # <-- Yahan 'train' parameter add karna zaroori hai
-    # Journey date query string se lo (e.g. ?date=2026-08-03)
+def live_train_api(train):
     journey_date = request.args.get("date")
 
     result = train_live(train, journey_date)
