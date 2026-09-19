@@ -219,7 +219,7 @@ async function getLiveStatus(e) {
                     <i class="fa-solid fa-route"></i> Journey Timeline
                 </h3>
                 <div id="timeline-container">
-                    ${renderTimeline(groupedRoute, current)}
+                   ${renderTimeline(groupedRoute, current, data.startDate)}
                 </div>
             </div>`;
 
@@ -309,8 +309,30 @@ function renderProgressBar(route, current) {
     </div>`;
 }
 
+function getStationDay(station, startDate) {
+    const dateTime =
+        station.scheduledArrival ||
+        station.scheduledDeparture;
+
+    if (!dateTime || !startDate) {
+        return 1;
+    }
+
+    // API date ka sirf YYYY-MM-DD part
+    const stationDate = dateTime.substring(0, 10);
+
+    const start = new Date(`${startDate}T00:00:00`);
+    const current = new Date(`${stationDate}T00:00:00`);
+
+    const diff = Math.round(
+        (current - start) / (1000 * 60 * 60 * 24)
+    );
+
+    return diff + 1;
+}
+
 // JOURNEY TIMELINE
-function renderTimeline(groupedRoute, current) {
+function renderTimeline(groupedRoute, current, startDate) {
 
     if (!groupedRoute) return "";
 
@@ -342,11 +364,11 @@ function renderTimeline(groupedRoute, current) {
             }
         }
 
-        html += createStationCard(station, status, color);
+        html += createStationCard(station, status, color, startDate);
 
         if (group.moreStations.length) {
 
-            html += createMoreStations(group.moreStations, current);
+            html += createMoreStations(group.moreStations, current, startDate);
 
         }
 
@@ -355,8 +377,7 @@ function renderTimeline(groupedRoute, current) {
     return html;
 }
 
-function createStationCard(station, status, iconColor) {
-
+function createStationCard(station, status, iconColor, startDate) {
     const arr = formatTime(station.scheduledArrival);
     const dep = formatTime(station.scheduledDeparture);
 
@@ -420,8 +441,7 @@ function createStationCard(station, status, iconColor) {
 
             &nbsp;&nbsp;&nbsp;
 
-            Day ${station.dayCount || 1}
-
+           Day ${getStationDay(station, startDate)}
         </div>
 
     </div>
@@ -445,7 +465,7 @@ function createStationCard(station, status, iconColor) {
 `;
 }
 
-function createMoreStations(stations, current) {
+function createMoreStations(stations, current, startDate) {
 
     let html = `
     <div class="more-wrapper">
@@ -511,7 +531,7 @@ function createMoreStations(stations, current) {
                 <div class="station-info">
                     Platform ${station.platform || "--"}
                     &nbsp;&nbsp;
-                    Day ${station.dayCount || 1}
+                    Day ${getStationDay(station, startDate)}
                 </div>
             </div>
 
@@ -1098,6 +1118,7 @@ async function getStationBoard(e) {
         resultBox.innerHTML = `<div class="error-msg"><i class="fa-solid fa-triangle-exclamation"></i> Failed to retrieve station board.</div>`;
     }
 }
+
 
 // 4. Get PNR Status
 async function getPNRStatus(e) {
