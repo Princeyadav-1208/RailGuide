@@ -346,7 +346,6 @@ def between_station(source: str, destination: str, date: str = None):
             "error": str(e)
         }
 
-    
 def get_train(user_input: str, trains: list):
     user_input = user_input.strip().upper()
 
